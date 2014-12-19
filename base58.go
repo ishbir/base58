@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-const alphabet = "123456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ"
+const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
 var decodeMap [256]byte
 
@@ -53,6 +53,12 @@ func EncodeBig(dst []byte, src *big.Int) []byte {
 	n.Set(src)
 	radix := big.NewInt(58)
 	zero := big.NewInt(0)
+
+	// Make behaviour consistent with base58encode in Bitmessage
+	if n.Cmp(zero) == 0 {
+		dst = append(dst, alphabet[0])
+		return dst
+	}
 
 	for n.Cmp(zero) > 0 {
 		mod := new(big.Int)
